@@ -45,14 +45,13 @@ def parse_book_page(soup):
     raw_img = soup.find(class_='bookimage').find('img')['src']
     img_url = urljoin("https://tululu.org", raw_img)
     download_image(img_url)
-    book_info['img_url'] = (img_url)
+    book_info['img_url'] = img_url
     
     raw_comment = soup.find(id='content').find_all(class_="texts")
     for comment in raw_comment:
         comment = comment.find('span').text
-        book_info['comments'] = (comment)
+        book_info['comments'] = comment
     return book_info
-
 
 
 def check_for_redirect(response):
@@ -73,7 +72,7 @@ def main():
 
     for book_id in range(int(args.start_id), int(args.end_id)):
         params = {
-        "id" : book_id
+            "id": book_id
         }
         try:
             response = requests.get(url, params=params)
