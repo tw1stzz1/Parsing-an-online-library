@@ -34,6 +34,7 @@ def download_image(img_url):
 
 def parse_book_page(soup):
     book_parameters = {}
+    comments = []
     raw_genre = soup.find_all(class_='d_book')[1].text
     genre = raw_genre.split(':')[1].strip()
 
@@ -42,18 +43,18 @@ def parse_book_page(soup):
     title = title[0].strip()
 
     raw_img = soup.find(class_='bookimage').find('img')['src']
-    img_url = urljoin("https://tululu.org/shots/", raw_img)
-    
-    book_parameters = {
-        'genre' : genre,
-        'title' : title,
-        'img_url' : img_url,
-    }
+    img_url = urljoin("https://tululu.org", raw_img)
 
     raw_comment = soup.find(id='content').find_all(class_="texts")
     for comment in raw_comment:
         comment = comment.find('span').text
-        book_parameters['comments'] = comment
+        comments.append(comment)
+    book_parameters = {
+            'genre' : genre,
+            'title' : title,
+            'img_url' : img_url,
+            'comments' : comments
+            }
     return book_parameters
 
 
