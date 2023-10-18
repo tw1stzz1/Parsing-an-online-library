@@ -32,7 +32,7 @@ def download_image(img_url):
     return img_filepath
 
 
-def parse_book_page(answer):
+def parse_book_page(answer, book_url):
     soup = BeautifulSoup(answer.text, 'lxml')
     comments = []
     raw_genre = soup.find_all(class_='d_book')[1].text
@@ -43,8 +43,8 @@ def parse_book_page(answer):
     title = title[0].strip()
 
     raw_img = soup.find(class_='bookimage').find('img')['src']
-    img_url = urljoin("https://tululu.org", raw_img)
-    
+    img_url = urljoin(book_url, raw_img)
+    print(img_url)
     raw_comment = soup.find(id='content').find_all(class_="texts")
     for comment in raw_comment:
         comment = comment.find('span').text
@@ -84,11 +84,12 @@ def main():
             check_for_redirect(response)
 
             book_url = f"https://tululu.org/b{book_id}/"
+
             answer = requests.get(book_url)
             answer.raise_for_status()
             check_for_redirect(answer)
 
-            book_parameters = parse_book_page(answer)
+            book_parameters = parse_book_page(answer, book_url)
             title = book_parameters['title']
             img_url = book_parameters['img_url']
             download_image(img_url)
