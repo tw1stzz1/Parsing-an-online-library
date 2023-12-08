@@ -2,8 +2,8 @@ import os
 import requests
 import argparse
 from pathlib import Path
-
 import time
+
 from urllib.parse import urljoin
 from urllib.parse import urlsplit
 from bs4 import BeautifulSoup
@@ -11,6 +11,8 @@ from pathvalidate import sanitize_filename
 
 
 def download_book(book_id, response, title):
+    Path("books").mkdir(parents=True, exist_ok=True)
+
     book_filename = sanitize_filename(f"{book_id}.{title}.txt")
     book_filepath = os.path.join("books", book_filename)
 
@@ -20,6 +22,8 @@ def download_book(book_id, response, title):
 
 
 def download_image(img_url):
+    Path("images").mkdir(parents=True, exist_ok=True)
+
     img_filename = urlsplit(img_url)[2]
     img_filename = img_filename.split('/')[-1]
     img_filepath = os.path.join("images", img_filename)
@@ -44,7 +48,6 @@ def parse_book_page(answer, book_url):
 
     raw_img = soup.find(class_='bookimage').find('img')['src']
     img_url = urljoin(book_url, raw_img)
-    print(img_url)
     raw_comment = soup.find(id='content').find_all(class_="texts")
     for comment in raw_comment:
         comment = comment.find('span').text
@@ -64,9 +67,6 @@ def check_for_redirect(response):
 
 
 def main():
-    Path("books").mkdir(parents=True, exist_ok=True)
-    Path("images").mkdir(parents=True, exist_ok=True)
-
     parser = argparse.ArgumentParser(description='This code allows you to download books and their covers form tululu')
     parser.add_argument('--start_id', default=1, help='Id of the book from which the download will begin')
     parser.add_argument('--end_id', default=11, help='Id of the book where the download will end')
