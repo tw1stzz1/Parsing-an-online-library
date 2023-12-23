@@ -161,4 +161,4 @@ cython_debug/
 
 books/
 images/
-books_json_parameters
+books_json_parameters.json
