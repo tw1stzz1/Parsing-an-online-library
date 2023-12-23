@@ -18,6 +18,7 @@ def download_book(book_id, response, title):
 
     with open(book_filepath, 'wb') as file:
        file.write(response.content)
+    return book_filepath
 
 
 
@@ -27,9 +28,8 @@ def download_image(img_url):
     img_filename = urlsplit(img_url)[2]
     img_filename = img_filename.split('/')[-1]
     img_filepath = os.path.join("images", img_filename)
-
+    
     response = requests.get(img_url)
-    response.raise_for_status() 
 
     with open(img_filepath, 'wb') as file:
         file.write(response.content)
@@ -39,15 +39,15 @@ def download_image(img_url):
 def parse_book_page(answer, book_url):
     soup = BeautifulSoup(answer.text, 'lxml')
     comments = []
-    genres = []
     raw_genres = soup.find_all(class_='d_book')[1].text
-    for genre in raw_genres:
-        genre = raw_genres.split(':')[1].strip()
-        genre = genre.split(',')
-        genres.append(genre)
+    genre = raw_genres.split(':')[1].strip()
+    genre = genre[:-1].split(',')
+    
     title_text = soup.find(id='content').find('h1').text
     title = title_text.split('::')
     title = title[0].strip()
+
+    author = soup.find(id='content').find('h1').find('a').text
 
     raw_img = soup.find(class_='bookimage').find('img')['src']
     img_url = urljoin(book_url, raw_img)
@@ -56,9 +56,10 @@ def parse_book_page(answer, book_url):
         comment = comment.find('span').text
         comments.append(comment)
     book_parameters = {
-            'genre' : genres,
             'title': title,
+            'author' : author,
             'img_url': img_url,
+            'genres' : genre,
             'comments' : comments
             }
     return book_parameters
