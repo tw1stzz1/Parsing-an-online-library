@@ -39,9 +39,12 @@ def download_image(img_url):
 def parse_book_page(answer, book_url):
     soup = BeautifulSoup(answer.text, 'lxml')
     comments = []
-    raw_genre = soup.find_all(class_='d_book')[1].text
-    genre = raw_genre.split(':')[1].strip()
-
+    genres = []
+    raw_genres = soup.find_all(class_='d_book')[1].text
+    for genre in raw_genres:
+        genre = raw_genres.split(':')[1].strip()
+        genre = genre.split(',')
+        genres.append(genre)
     title_text = soup.find(id='content').find('h1').text
     title = title_text.split('::')
     title = title[0].strip()
@@ -53,7 +56,7 @@ def parse_book_page(answer, book_url):
         comment = comment.find('span').text
         comments.append(comment)
     book_parameters = {
-            'genre' : genre,
+            'genre' : genres,
             'title': title,
             'img_url': img_url,
             'comments' : comments
