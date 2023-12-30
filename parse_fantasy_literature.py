@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from main import download_book, download_image, parse_book_page, check_for_redirect
+from parse_business_literature import download_book, download_image, parse_book_page, check_for_redirect
 
 
 parser = argparse.ArgumentParser(description='This code allows you to download books and their covers form tululu')
