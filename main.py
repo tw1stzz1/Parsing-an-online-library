@@ -10,11 +10,13 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def download_book(book_id, response, title):
-    Path("books").mkdir(parents=True, exist_ok=True)
+def download_book(book_id, response, title, dest_folder):
+    full_path = f'{dest_folder}/books'
+
+    Path(full_path).mkdir(parents=True, exist_ok=True)
 
     book_filename = sanitize_filename(f"{book_id}.{title}.txt")
-    book_filepath = os.path.join("books", book_filename)
+    book_filepath = os.path.join(full_path, book_filename)
 
     with open(book_filepath, 'wb') as file:
        file.write(response.content)
@@ -22,12 +24,14 @@ def download_book(book_id, response, title):
 
 
 
-def download_image(img_url):
-    Path("images").mkdir(parents=True, exist_ok=True)
+def download_image(img_url, dest_folder):
+    full_path = f'{dest_folder}/images'
+
+    Path(full_path).mkdir(parents=True, exist_ok=True)
 
     img_filename = urlsplit(img_url)[2]
     img_filename = img_filename.split('/')[-1]
-    img_filepath = os.path.join("images", img_filename)
+    img_filepath = os.path.join(full_path, img_filename)
 
     response = requests.get(img_url)
 

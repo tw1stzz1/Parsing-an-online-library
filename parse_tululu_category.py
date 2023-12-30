@@ -2,11 +2,26 @@ import requests
 from urllib.parse import urljoin
 import time
 import json
+import argparse
+from pathlib import Path
 
 from bs4 import BeautifulSoup
 from main import download_book, download_image, parse_book_page, check_for_redirect
 
-for nunbers in range(1, 2):
+
+parser = argparse.ArgumentParser(description='This code allows you to download books and their covers form tululu')
+parser.add_argument('--start_page', default=1, help='Page from which the download will begin')
+parser.add_argument('--end_page', default=4, help='Page where the download will end')
+parser.add_argument('--skip_imgs', default=False, help='This setting skips image download')
+parser.add_argument('--skip_txt', default=False, help='This setting skips txt file download')
+parser.add_argument('--dest_folder', default="result", help='This setting skips txt file download')
+args = parser.parse_args()
+
+Path(args.dest_folder).mkdir(parents=True, exist_ok=True)
+
+book_txt_url = "https://tululu.org/txt.php"
+dest_folder = args.dest_folder
+for nunbers in range(int(args.start_page), int(args.end_page)):
     url = f"https://tululu.org/l55/{nunbers}/"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
@@ -25,16 +40,23 @@ for nunbers in range(1, 2):
             book_parameters = parse_book_page(answer, book_url)
             title = book_parameters['title']
             img_url = book_parameters['img_url']
-            img_path = download_image(img_url)
+            if not args.skip_imgs:
+                img_path = download_image(img_url, dest_folder)
+            else:
+                img_path = None
             
-            book_txt_url = "https://tululu.org/txt.php"
-            params = {
-                "id": book_id
-            }
-            response = requests.get(book_txt_url, params=params)
-            check_for_redirect(response)
-            book_path = download_book(book_id, response, title)
 
+            if not args.skip_txt:
+                params = {
+                    "id": book_id
+                }
+                response = requests.get(book_txt_url, params=params)
+                check_for_redirect(response)
+
+                book_path = download_book(book_id, response, title, dest_folder)
+            else:
+                book_path = None
+            
             book_json_parameters = {
             'title': title,
             'author' : book_parameters['author'],
@@ -54,5 +76,5 @@ for nunbers in range(1, 2):
 
 books_json_parameters = json.dumps(books_json_parameters, ensure_ascii=False)
 
-with open("books_json_parameters.json", "w", encoding='utf8') as my_file:
+with open(f"{args.dest_folder}/books_json_parameters.json", "w", encoding='utf8') as my_file:
     my_file.write(books_json_parameters)
