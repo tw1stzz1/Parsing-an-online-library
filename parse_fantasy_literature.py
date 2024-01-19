@@ -12,8 +12,8 @@ def main():
     parser = argparse.ArgumentParser(description='This code allows you to download books and their covers form tululu')
     parser.add_argument('--start_page', default=1, help='Page from which the download will begin')
     parser.add_argument('--end_page', default=4, help='Page where the download will end')
-    parser.add_argument('--skip_imgs', default=False, help='This setting skips image download')
-    parser.add_argument('--skip_txt', default=False, help='This setting skips txt file download')
+    parser.add_argument('--skip_imgs', action='store_false', help='This setting skips image download')
+    parser.add_argument('--skip_txt', action='store_false', help='This setting skips txt file download')
     parser.add_argument('--dest_folder', default="result", help='This setting skips txt file download')
     args = parser.parse_args()
 
@@ -21,8 +21,8 @@ def main():
 
     book_txt_url = "https://tululu.org/txt.php"
     dest_folder = args.dest_folder
-    for nunbers in range(int(args.start_page), int(args.end_page)):
-        url = f"https://tululu.org/l55/{nunbers}/"
+    for numbers in range(int(args.start_page), int(args.end_page)):
+        url = f"https://tululu.org/l55/{numbers}/"
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'lxml')
         books_json_parameters = []
