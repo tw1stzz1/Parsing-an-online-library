@@ -12,8 +12,8 @@ def main():
     parser = argparse.ArgumentParser(description='This code allows you to download books and their covers form tululu')
     parser.add_argument('--start_page', default=1, help='Page from which the download will begin')
     parser.add_argument('--end_page', default=4, help='Page where the download will end')
-    parser.add_argument('--skip_imgs', action='store_false', help='This setting skips image download')
-    parser.add_argument('--skip_txt', action='store_false', help='This setting skips txt file download')
+    parser.add_argument('--skip_imgs', action='store_true', help='This setting skips image download')
+    parser.add_argument('--skip_txt', action='store_true', help='This setting skips txt file download')
     parser.add_argument('--dest_folder', default="result", help='This setting skips txt file download')
     args = parser.parse_args()
 
@@ -27,11 +27,11 @@ def main():
             response = requests.get(url)
             check_for_redirect(response)
             soup = BeautifulSoup(response.text, 'lxml')
-            books_json_parameters = []
+            books_parameters = []
             books = soup.find_all(class_='d_book')
             try:
-                for book_id in books:
-                    book_id = book_id.find('a')['href']
+                for book in books:
+                    book_id = book.find('a')['href']
                     book_url = urljoin(url, book_id)
                     book_id = book_id[2:-1]
 
@@ -59,7 +59,7 @@ def main():
                     else:
                         book_path = None
                     
-                    book_json_parameters = {
+                    book_parameters = {
                     'title': title,
                     'author' : book_parameters['author'],
                     'img_src' : img_path,
@@ -68,7 +68,7 @@ def main():
                     'comments' : book_parameters['comments']
                     }
                     
-                    books_json_parameters.append(book_json_parameters)
+                    books_parameters.append(book_parameters)
             except requests.exceptions.ConnectionError:
                 print("Разрыв соединения c сайтом")
                 time.sleep(20)
@@ -80,10 +80,9 @@ def main():
                 print("Разрыв соединения c сайтом")
                 time.sleep(20)
 
-    books_json_parameters = json.dumps(books_json_parameters, ensure_ascii=False)
 
-    with open(f"{args.dest_folder}/books_json_parameters.json", "w", encoding='utf8') as my_file:
-        my_file.write(books_json_parameters)
+    with open(f"{args.dest_folder}/books_parameters.json", "w", encoding='utf8') as file:
+        json.dump(books_parameters, file, ensure_ascii=False)
 
 if __name__ == "__main__":
     main()
