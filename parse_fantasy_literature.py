@@ -8,6 +8,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from tools import download_book, download_image, parse_book_page, check_for_redirect
 
+
 def main():
     parser = argparse.ArgumentParser(description='This code allows you to download books and their covers form tululu')
     parser.add_argument('--start_page', default=1, help='Page from which the download will begin')
@@ -25,21 +26,20 @@ def main():
         page_url = f"https://tululu.org/l55/{numbers}/"
         try:
             response = requests.get(page_url)
-            print(check_for_redirect(response))
+            check_for_redirect(response)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'lxml')
             books_parameters = []
             books = soup.find_all(class_='d_book')
-            try:
-                for book in books:
-                    book_id = book.find('a')['href']
-                    book_url = urljoin(page_url, book_id)
-                    book_id = book_id[2:-1]
-
+            for book in books:
+                book_link = book.find('a')['href']
+                book_url = urljoin(page_url, book_link)
+                book_id = book_link[2:-1]
+                try:
                     answer = requests.get(book_url)
-                    answer.raise_for_status()
                     check_for_redirect(answer)
-                    
+                    answer.raise_for_status()
+
                     book_parameters = parse_book_page(answer, book_url)
                     title = book_parameters['title']
                     img_url = book_parameters['img_url']
@@ -47,7 +47,6 @@ def main():
                         img_path = download_image(img_url, dest_folder)
                     else:
                         img_path = None
-                    
 
                     if not args.skip_txt:
                         params = {
@@ -60,31 +59,31 @@ def main():
                         book_path = download_book(book_id, response, title, dest_folder)
                     else:
                         book_path = None
-                    
+
                     book_parameters = {
-                    'title': title,
-                    'author' : book_parameters['author'],
-                    'img_src' : img_path,
-                    'book_path' : book_path,
-                    'genres' : book_parameters['genres'],
-                    'comments' : book_parameters['comments']
-                    }
-                    
+                        'title': title,
+                        'author': book_parameters['author'],
+                        'img_src': img_path,
+                        'book_path': book_path,
+                        'genres': book_parameters['genres'],
+                        'comments': book_parameters['comments']
+                        }
+
                     books_parameters.append(book_parameters)
-            except requests.exceptions.ConnectionError:
-                print("Разрыв соединения c сайтом")
-                time.sleep(20)
-            except requests.exceptions.HTTPError:
-                print("Такой книги нет!", book_id)
+                except requests.exceptions.ConnectionError:
+                    print("Разрыв соединения c сайтом")
+                    time.sleep(20)
+                except requests.exceptions.HTTPError:
+                    print("Такой книги нет!", book_id)
         except requests.exceptions.HTTPError:
                 print("Такой страницы нет!")
         except requests.exceptions.HTTPError:
                 print("Разрыв соединения c сайтом")
                 time.sleep(20)
 
-
     with open(f"{args.dest_folder}/books_parameters.json", "w", encoding='utf8') as file:
         json.dump(books_parameters, file, ensure_ascii=False)
+
 
 if __name__ == "__main__":
     main()

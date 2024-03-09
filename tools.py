@@ -44,7 +44,7 @@ def parse_book_page(answer, book_url):
     raw_genres = soup.select(".d_book")[1].text
     genre = raw_genres.split(':')[1].strip()
     genre = genre[:-1].split(',')
-    
+
     title_text = soup.select_one("#content h1").text
     title = title_text.split('::')
     title = title[0].strip()
@@ -60,10 +60,10 @@ def parse_book_page(answer, book_url):
         comments.append(comment)
     book_parameters = {
             'title': title,
-            'author' : author,
+            'author': author,
             'img_url': img_url,
-            'genres' : genre,
-            'comments' : comments
+            'genres': genre,
+            'comments': comments
             }
     return book_parameters
 
