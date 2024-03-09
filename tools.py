@@ -31,6 +31,7 @@ def download_image(img_url, dest_folder):
     img_filepath = os.path.join(full_path, img_filename)
 
     response = requests.get(img_url)
+    response.raise_for_status()
 
     with open(img_filepath, 'wb') as file:
         file.write(response.content)
