@@ -54,17 +54,17 @@ def parse_book_page(answer, book_url):
     raw_img = soup.select_one(".bookimage img")["src"]
     img_url = urljoin(book_url, raw_img)
 
-    raw_comment = soup.select("#content .texts")
-    for comment in raw_comment:
+    raw_comments = soup.select("#content .texts")
+    for comment in raw_comments:
         comment = comment.select_one("span").text
         comments.append(comment)
     book_parameters = {
-            'title': title,
-            'author': author,
-            'img_url': img_url,
-            'genres': genre,
-            'comments': comments
-            }
+        'title': title,
+        'author': author,
+        'img_url': img_url,
+        'genres': genre,
+        'comments': comments
+    }
     return book_parameters
 
 
