@@ -23,7 +23,7 @@ def main():
     book_txt_url = "https://tululu.org/txt.php"
     dest_folder = args.dest_folder
     books_archive = []
-    for number in range(int(args.start_page), int(args.end_page)):
+    for number in range(args.start_page, args.end_page):
         page_url = f"https://tululu.org/l55/{number}/"
         try:
             response = requests.get(page_url)
