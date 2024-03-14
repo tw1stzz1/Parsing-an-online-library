@@ -11,8 +11,8 @@ from tools import download_book, download_image, parse_book_page, check_for_redi
 
 def main():
     parser = argparse.ArgumentParser(description='This code allows you to download books and their covers form tululu')
-    parser.add_argument('--start_page', default=1, help='Page from which the download will begin')
-    parser.add_argument('--end_page', default=4, help='Page where the download will end')
+    parser.add_argument('--start_page', default=1, help='Page from which the download will begin', type=int)
+    parser.add_argument('--end_page', default=4, help='Page where the download will end', type=int)
     parser.add_argument('--skip_imgs', action='store_true', help='This setting skips image download')
     parser.add_argument('--skip_txt', action='store_true', help='This setting skips txt file download')
     parser.add_argument('--dest_folder', default="result", help='This setting skips txt file download')
